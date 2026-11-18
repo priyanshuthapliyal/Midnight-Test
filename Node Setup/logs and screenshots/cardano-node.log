@@ -1,0 +1,31 @@
+azureuser@Midnite-node:/data/monitoring$ sudo journalctl -fu cardano-node
+Nov 17 19:58:02 Midnite-node cardano-node[22223]: [2026-11-17 19:58:02.8291Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":19737,"numTxs":12},"tx":{"txid":"2b827264"}}}
+Nov 17 19:58:06 Midnite-node cardano-node[22223]: [2026-11-17 19:58:06.1560Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":21977,"numTxs":13},"tx":{"txid":"f537553e"}}}
+Nov 17 19:58:10 Midnite-node cardano-node[22223]: [2026-11-17 19:58:10.1256Z][Midnite-node:ChainDB.PerasCertDbEvent.GarbageCollected](Info,51) Peras certificate DB garbage collected at slot SlotNo 139212060
+Nov 17 19:58:10 Midnite-node cardano-node[22223]: [2026-11-17 19:58:10.1256Z][Midnite-node:ChainDB.PerasVoteDbEvent.GarbageCollected](Info,51) Peras vote DB garbage collected at slot SlotNo 139212060
+Nov 17 19:58:26 Midnite-node cardano-node[22223]: [2026-11-17 19:58:26.6464Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":24217,"numTxs":14},"tx":{"txid":"db6094cb"}}}
+Nov 17 19:58:26 Midnite-node cardano-node[22223]: [2026-11-17 19:58:26.6673Z][Midnite-node:Mempool.RejectedTx](Info,6135) {"data":{"kind":"TraceMempoolRejectedTx","mempoolSize":{"bytes":24217,"numTxs":14},"tx":{"txid":"db6094cb"}}}
+Nov 17 19:58:26 Midnite-node cardano-node[22223]: [2026-11-17 19:58:26.9707Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":26457,"numTxs":15},"tx":{"txid":"4b736168"}}}
+Nov 17 19:58:26 Midnite-node cardano-node[22223]: [2026-11-17 19:58:26.9863Z][Midnite-node:Mempool.RejectedTx](Info,6135) {"data":{"kind":"TraceMempoolRejectedTx","mempoolSize":{"bytes":26457,"numTxs":15},"tx":{"txid":"4b736168"}}}
+Nov 17 19:58:27 Midnite-node cardano-node[22223]: [2026-11-17 19:58:27.7425Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":28697,"numTxs":16},"tx":{"txid":"d15b410d"}}}
+Nov 17 19:58:32 Midnite-node cardano-node[22223]: [2026-11-17 19:58:32.0035Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":28996,"numTxs":17},"tx":{"txid":"4c2ef898"}}}
+Nov 17 19:58:35 Midnite-node cardano-node[22223]: [2026-11-17 19:58:35.3605Z][Midnite-node:Mempool.AddedTx](Info,6676) {"data":{"kind":"TraceMempoolAddedTx","mempoolSize":{"bytes":31236,"numTxs":18},"tx":{"txid":"4e807741"}}}
+Nov 17 19:58:35 Midnite-node cardano-node[22223]: [2026-11-17 19:58:35.3817Z][Midnite-node:Mempool.RejectedTx](Info,6135) {"data":{"kind":"TraceMempoolRejectedTx","mempoolSize":{"bytes":31236,"numTxs":18},"tx":{"txid":"4e807741"}}}
+Nov 17 19:58:36 Midnite-node cardano-node[22223]: [2026-11-17 19:58:36.5669Z][Midnite-node:ChainDB.AddBlockEvent.AddedToCurrentChain](Notice,47) Chain extended, new tip: da254e2a922a27e11b5a900c0e27863265dc1107ddf40feb02a7bb9efe43c99c at slot 139262316
+Nov 17 19:58:36 Midnite-node cardano-node[22223]: [2026-11-17 19:58:36.5683Z][Midnite-node:Mempool.RemoveTxs](Info,59) {"data":{"kind":"TraceMempoolRemoveTxs","mempoolSize":{"bytes":0,"numTxs":0},"txs":[{"tx":{"txid":"4e807741"}},{"tx":{"txid":"4c2ef898"}},{"tx":{"txid":"d15b410d"}},{"tx":{"txid":"4b736168"}},{"tx":{"txid":"db6094cb"}},{"tx":{"txid":"f537553e"}},{"tx":{"txid":"2b827264"}},{"tx":{"txid":"269120bf"}},{"tx":{"txid":"991a9e91"}},{"tx":{"txid":"912a51df"}},{"tx":{"txid":"a414cea2"}},{"tx":{"txid":"01f148e8"}},{"tx":{"txid":"1b74d518"}},{"tx":{"txid":"afa197b1"}},{"tx":{"txid":"d323d485"}},{"tx":{"txid":"6407b468"}},{"tx":{"txid":"7c59ab8e"}},{"tx":{"txid":"059572da"}}]}}
+Nov 17 19:58:40 Midnite-node cardano-node[22223]: [2026-11-17 19:58:40.1255Z][Midnite-node:ChainDB.PerasCertDbEvent.GarbageCollected](Info,51) Peras certificate DB garbage collected at slot SlotNo 139212067
+Nov 17 19:58:40 Midnite-node cardano-node[22223]: [2026-11-17 19:58:40.1255Z][Midnite-node:ChainDB.PerasVoteDbEvent.GarbageCollected](Info,51) Peras vote DB garbage collected at slot SlotNo 139212067
+
+
+azureuser@Midnite-node:/data/monitoring$ export CARDANO_NODE_SOCKET_PATH="/data/cardano-data/db/node.socket"
+cardano-cli query tip --testnet-magic 1
+{
+    "block": 5424242,
+    "epoch": 326,
+    "era": "Conway",
+    "hash": "b9b04e481343553c6de8607678692a7980699e54eb1cdfc4bea8bc200d1539a3",
+    "slot": 139262383,
+    "slotInEpoch": 71983,
+    "slotsToEpochEnd": 360017,
+    "syncProgress": "100.00"
+}azureuser@Midnite-node:/data/monitoring$

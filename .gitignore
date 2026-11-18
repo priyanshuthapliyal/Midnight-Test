@@ -1,0 +1,17 @@
+# Terraform state & local files
+*.tfstate
+*.tfstate.*
+*.tfstate.lock.info
+.terraform/
+terraform.tfstate.d/
+
+# Secret tfvars & env files
+secrets.auto.tfvars
+*.secret.tfvars
+.env
+.env.*
+
+# TLS private keys and generated certs
+*.key
+*.pem
+certs/

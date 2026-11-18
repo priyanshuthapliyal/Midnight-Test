@@ -1,0 +1,47 @@
+groups:
+  - name: midnight-node-alerts
+    rules:
+      - alert: MidnightNodeDown
+        expr: up{job="midnight-node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Midnight node is down"
+          description: "Prometheus cannot scrape midnight-node on :9615 for 1m (process crash or systemd stop)."
+
+      - alert: MidnightBlockImportStalled
+        expr: increase(substrate_block_height{status="best"}[5m]) == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Midnight node stopped importing/producing blocks"
+          description: "Best block height has not increased in the last 5m."
+
+      - alert: MidnightLowPeers
+        expr: substrate_sub_libp2p_peers_count < 3
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low P2P peer count ({{ $value }})"
+          description: "Connected peers dropped below 3 for 3m; risk of isolation or missed blocks."
+
+      - alert: MidnightFinalityLag
+        expr: (substrate_block_height{status="best"} - ignoring(status) substrate_block_height{status="finalized"}) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Finality lagging behind best block by {{ $value }} blocks"
+          description: "GRANDPA finality gap exceeded 10 blocks for 5m."
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host memory usage above 90% ({{ printf \"%.1f\" $value }}%)"
+          description: "Risk of OOM kill for midnight-node or PostgreSQL."

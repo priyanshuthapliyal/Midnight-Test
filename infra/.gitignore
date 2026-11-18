@@ -1,0 +1,29 @@
+# Terraform directories and state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.lock.info
+*.tfplan
+terraform.tfstate.d/
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Secret variable files (do NOT ignore terraform.tfvars.example or environments/*.tfvars)
+terraform.tfvars
+*.auto.tfvars
+
+# Environment files
+.env
+.env.*
+
+# Private keys & credential files
+*.key
+*.pem
+*.p12
+*.crt
+.pgpass
+pgpass
+secrets/
+certs/

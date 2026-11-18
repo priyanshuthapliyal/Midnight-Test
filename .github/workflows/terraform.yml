@@ -1,0 +1,273 @@
+name: Terraform Docker CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - preview
+          - preprod
+          - mainnet
+      action:
+        description: "Terraform action (Mainnet apply requires manual dispatch + environment approval)"
+        required: true
+        default: plan
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Format, Validate, Lint, Scan & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9.0"
+          terraform_wrapper: false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init (Backend Disabled)
+        run: terraform init -backend=false -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint --recursive
+
+      - name: Run Checkov Security Scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra
+          framework: terraform
+
+      - name: Run Terraform Native Tests
+        run: terraform test -no-color
+
+  plan:
+    name: Plan (${{ matrix.environment }})
+    needs: validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [preview, preprod, mainnet]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9.0"
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Select Workspace (${{ matrix.environment }})
+        run: terraform workspace select -or-create "${{ matrix.environment }}"
+
+      - name: Terraform Plan (${{ matrix.environment }})
+        env:
+          # Non-secret CI placeholders for plan-only validation; sensitive values are masked by Terraform.
+          TF_VAR_postgres_password: "ci-plan-only-placeholder-password"
+          TF_VAR_indexer_secret: "0000000000000000000000000000000000000000000000000000000000000000"
+          TF_VAR_blockfrost_api_key: "dummy-not-using-spo"
+        run: |
+          terraform plan -input=false -no-color \
+            -var-file="environments/${{ matrix.environment }}.tfvars" \
+            | tee "plan-${{ matrix.environment }}.txt"
+
+      - name: Publish Plan Summary
+        run: |
+          echo "### Terraform Plan: \`${{ matrix.environment }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '```hcl' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 60 "plan-${{ matrix.environment }}.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Sanitized Plan Text Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: infra/plan-${{ matrix.environment }}.txt
+          retention-days: 7
+
+  deploy_preview:
+    name: Deploy Preview
+    needs: [validate, plan]
+    if: >-
+      github.event_name != 'pull_request' && (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_dispatch' && inputs.environment == 'preview' && inputs.action == 'apply')
+      )
+    environment: preview
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9.0"
+          terraform_wrapper: false
+
+      - name: Terraform Init & Workspace
+        run: |
+          terraform init -input=false
+          terraform workspace select -or-create preview
+
+      - name: Plan or Apply Preview
+        env:
+          TF_VAR_docker_host: ${{ vars.DOCKER_HOST || 'unix:///var/run/docker.sock' }}
+          TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD || 'ci-plan-only-placeholder-password' }}
+          TF_VAR_indexer_secret: ${{ secrets.INDEXER_SECRET || '0000000000000000000000000000000000000000000000000000000000000000' }}
+          TF_VAR_blockfrost_api_key: ${{ secrets.BLOCKFROST_API_KEY || 'dummy-not-using-spo' }}
+        run: |
+          if [[ "${{ vars.ENABLE_PERSISTENT_APPLY }}" == "true" ]]; then
+            terraform apply -auto-approve -input=false -var-file="environments/preview.tfvars"
+          else
+            echo "Persistent Docker target not enabled (vars.ENABLE_PERSISTENT_APPLY != 'true'). Running safe plan-only check."
+            terraform plan -input=false -var-file="environments/preview.tfvars"
+          fi
+
+  deploy_preprod:
+    name: Deploy PreProd
+    needs: [validate, plan]
+    if: >-
+      github.event_name != 'pull_request' && (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_dispatch' && inputs.environment == 'preprod' && inputs.action == 'apply')
+      )
+    environment: preprod
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    concurrency:
+      group: deploy-preprod
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9.0"
+          terraform_wrapper: false
+
+      - name: Terraform Init & Workspace
+        run: |
+          terraform init -input=false
+          terraform workspace select -or-create preprod
+
+      - name: Plan or Apply PreProd
+        env:
+          TF_VAR_docker_host: ${{ vars.DOCKER_HOST || 'unix:///var/run/docker.sock' }}
+          TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD || 'ci-plan-only-placeholder-password' }}
+          TF_VAR_indexer_secret: ${{ secrets.INDEXER_SECRET || '0000000000000000000000000000000000000000000000000000000000000000' }}
+          TF_VAR_blockfrost_api_key: ${{ secrets.BLOCKFROST_API_KEY || 'dummy-not-using-spo' }}
+        run: |
+          if [[ "${{ vars.ENABLE_PERSISTENT_APPLY }}" == "true" ]]; then
+            terraform apply -auto-approve -input=false -var-file="environments/preprod.tfvars"
+          else
+            echo "Persistent Docker target not enabled (vars.ENABLE_PERSISTENT_APPLY != 'true'). Running safe plan-only check."
+            terraform plan -input=false -var-file="environments/preprod.tfvars"
+          fi
+
+  deploy_mainnet:
+    name: Deploy Mainnet (Manual Approval Required)
+    needs: [validate, plan]
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.environment == 'mainnet' &&
+      inputs.action == 'apply'
+    environment: mainnet
+    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    concurrency:
+      group: deploy-mainnet
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9.0"
+          terraform_wrapper: false
+
+      - name: Terraform Init & Workspace
+        run: |
+          terraform init -input=false
+          terraform workspace select -or-create mainnet
+
+      - name: Plan or Apply Mainnet
+        env:
+          TF_VAR_docker_host: ${{ vars.DOCKER_HOST || 'unix:///var/run/docker.sock' }}
+          TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD || 'ci-plan-only-placeholder-password' }}
+          TF_VAR_indexer_secret: ${{ secrets.INDEXER_SECRET || '0000000000000000000000000000000000000000000000000000000000000000' }}
+          TF_VAR_blockfrost_api_key: ${{ secrets.BLOCKFROST_API_KEY || 'dummy-not-using-spo' }}
+        run: |
+          if [[ "${{ vars.ENABLE_PERSISTENT_APPLY }}" == "true" ]]; then
+            terraform apply -auto-approve -input=false -var-file="environments/mainnet.tfvars"
+          else
+            echo "Persistent Docker target not enabled (vars.ENABLE_PERSISTENT_APPLY != 'true'). Running safe plan-only check."
+            terraform plan -input=false -var-file="environments/mainnet.tfvars"
+          fi

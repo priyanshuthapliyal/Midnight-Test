@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars (gitignored) or supply secrets via TF_VAR_* environment variables.
+# Do NOT commit actual credentials.
+
+postgres_password  = "CHANGE_ME_STRONG_POSTGRES_PASSWORD"
+indexer_secret     = "0000000000000000000000000000000000000000000000000000000000000000" # openssl rand -hex 32
+blockfrost_api_key = "dummy-not-using-spo"

@@ -1,0 +1,23 @@
+azureuser@Midnite-node:/data/monitoring$sudo journalctl -fu cardano-db-sync
+Nov 17 19:57:07 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:57:07.27 UTC] Blocks deleted
+Nov 17 19:57:07 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:57:07.30 UTC] Insert Conway Block: epoch 326, slot 139262222, block 5424239, hash 105293d7656a9b808a3b79adda817c6e25fbc0b78c414092c1dcf4fa6907db41
+Nov 17 19:57:07 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:57:07.30 UTC] Setting ConsistencyLevel to Consistent
+Nov 17 19:57:38 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:57:38.92 UTC] Insert Conway Block: continuing epoch 326 (slot 71858/432000)
+Nov 17 19:57:38 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:57:38.92 UTC] Insert Conway Block: epoch 326, slot 139262258, block 5424240, hash e5f23481cd8d1b4c5887b58f8a9e7736ee88d96935d7cc4fd1ed2eabbb09bd14
+Nov 17 19:58:36 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:58:36.61 UTC] Insert Conway Block: epoch 326, slot 139262316, block 5424241, hash da254e2a922a27e11b5a900c0e27863265dc1107ddf40feb02a7bb9efe43c99c
+Nov 17 19:59:43 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 19:59:43.35 UTC] Insert Conway Block: epoch 326, slot 139262383, block 5424242, hash b9b04e481343553c6de8607678692a7980699e54eb1cdfc4bea8bc200d1539a3
+Nov 17 20:00:59 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 20:00:59.46 UTC] Insert Conway Block: epoch 326, slot 139262459, block 5424243, hash afd3adc1565d5d569eae1346d0d661fa3ca0b72cbecb207bcc8c3f7ff8a84628
+Nov 17 20:01:00 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 20:01:00.40 UTC] Insert Conway Block: epoch 326, slot 139262460, block 5424244, hash 08b185c53535adbe0ad78c0b54a1a95a68fe5b37912539fb03cb2c4404f8882c
+Nov 17 20:01:08 Midnite-node cardano-db-sync[22266]: [db-sync-node:Info:151] [2026-11-17 20:01:08.35 UTC] Insert Conway Block: epoch 326, slot 139262468, block 5424245, hash cdd795d0a2c4bb0ce2cdc90e7d45d8c6d1baf1dda647d264349b840bc20984d1
+
+
+azureuser@Midnite-node:/data/monitoring$ PGPASSFILE=/data/.pgpass psql -h 127.0.0.1 -U midnight -d cexplorer -c "
+SELECT
+    100 * (EXTRACT(epoch FROM (MAX(time) AT TIME ZONE 'UTC')) - EXTRACT(epoch FROM (MIN(time) AT TIME ZONE 'UTC')))
+    / (EXTRACT(epoch FROM (NOW() AT TIME ZONE 'UTC')) - EXTRACT(epoch FROM (MIN(time) AT TIME ZONE 'UTC')))
+AS sync_percent
+FROM block;"
+    sync_percent
+---------------------
+ 99.9999981343714809
+(1 row)
