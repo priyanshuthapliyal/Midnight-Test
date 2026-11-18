@@ -1,6 +1,6 @@
 # Cardano Availability Layer Setup Guide (Preprod)
 
-> **Setup Order — Step 1 of 4** | [Overview](./README.md) · **Next:** [Step 2: FNO Setup (Midnight Node & Keys)](./FNOSetup.md) →  
+> **Setup Order — Step 1 of 4** | [Overview](./README.md) · **Next:** [Step 2: FNO Setup (Midnight Node & Keys)](./Validator%20key%20genration.md) →  
 > **Document Scope:** Midnight Network Preprod Track  
 > **Source Reference:** `midnightntwrk/midnight-network-ops` (`cardano-node.md`, `postgresql.md`, `cardano-db-sync.md` — commit `25d2d3c`, synced `2026-09-15`)
 
@@ -460,4 +460,4 @@ FROM block;\""
 
 ---
 
-**Navigation:** [Overview](./README.md) · **Next:** [Step 2: FNO Setup (Midnight Node & Keys) →](./FNOSetup.md)
+**Navigation:** [Overview](./README.md) · **Next:** [Step 2: FNO Setup (Midnight Node & Keys) →](./Validator%20key%20genration.md)

@@ -1,6 +1,6 @@
 # Midnight Preprod WireGuard Overlay Setup Guide
 
-> **Setup Order — Step 3 of 4** | [← Step 2: FNO Setup](./FNOSetup.md) · [Overview](./README.md) · **Next:** [Step 4: Running the Validator](./running%20validator.md) →  
+> **Setup Order — Step 3 of 4** | [← Step 2: FNO Setup](./Validator%20key%20genration.md) · [Overview](./README.md) · **Next:** [Step 4: Running the Validator](./running%20validator.md) →  
 > **Document Scope:** Midnight Network — Federated Node Operator (FNO) Trusted Overlay (Preprod)  
 > **Source Reference:** `midnightntwrk/midnight-network-ops` (`docs/fno-guides/preprod/wireguard-integration.md`, commit `25d2d3c`, synced `2026-09-15`)
 
@@ -11,7 +11,7 @@ This guide walks you through integrating your validator node into the **Midnight
 > - **What is the trusted overlay?** On Preprod, Midnight validators do not peer over the open internet. Instead, they communicate over an encrypted **WireGuard VPN mesh** (the "trusted overlay") connecting authorized Federated Node Operators (FNOs).
 > - **Two separate identities are involved:**
 >   1. **WireGuard Keypair (`privatekey` / `publickey`)** — Authenticates your server to the encrypted WireGuard VPN tunnel.
->   2. **Substrate Network Key (`secret_ed25519` / `PeerID`)** — Your `midnight-node` P2P identity *inside* the network (already generated in [FNOSetup.md](./FNOSetup.md)).
+>   2. **Substrate Network Key (`secret_ed25519` / `PeerID`)** — Your `midnight-node` P2P identity *inside* the network (already generated in [Validator key genration.md](./Validator%20key%20genration.md)).
 
 ---
 
@@ -48,7 +48,7 @@ flowchart LR
 > [!IMPORTANT]
 > **Static Public IP Required:** Before you begin, ensure your server has a **static public IP address** configured, and that your firewall/security group allows inbound UDP traffic on the WireGuard listen port you will use in `wg0.conf`.
 
-- **Prerequisite Guide:** Complete [FNOSetup.md](./FNOSetup.md) first so that `midnight-node` is installed and `$HOME/data/chains/midnight_preprod/network/secret_ed25519` already exists.
+- **Prerequisite Guide:** Complete [Validator key genration.md](./Validator%20key%20genration.md) first so that `midnight-node` is installed and `$HOME/data/chains/midnight_preprod/network/secret_ed25519` already exists.
 - **Target Version:** `wireguard-tools` `v1.0.20250521` (built from source).
 
 ---
@@ -103,7 +103,7 @@ wg genkey | tee privatekey | wg pubkey > publickey
 ### 2.2 Substrate Network Key (Node Identity)
 
 > [!WARNING]
-> **Do NOT regenerate `secret_ed25519`!** You already generated this key in [FNOSetup.md](./FNOSetup.md). Regenerating it changes your `PeerID`, which must match what you share with the Midnight Foundation.
+> **Do NOT regenerate `secret_ed25519`!** You already generated this key in [Validator key genration.md](./Validator%20key%20genration.md). Regenerating it changes your `PeerID`, which must match what you share with the Midnight Foundation.
 
 Inspect your existing network key to retrieve your node's **Peer ID**:
 
@@ -175,4 +175,4 @@ sudo wg show
 
 ---
 
-**Navigation:** [← Step 2: FNO Setup](./FNOSetup.md) · [Overview](./README.md) · **Next:** [Step 4: Running the Validator →](./running%20validator.md)
+**Navigation:** [← Step 2: FNO Setup](./Validator%20key%20genration.md) · [Overview](./README.md) · **Next:** [Step 4: Running the Validator →](./running%20validator.md)

@@ -27,7 +27,7 @@ This repository contains two complementary deployment paths alongside observabil
 ├── Node Setup/
 │   ├── README.md                     # 4-step Preprod setup index & system requirements
 │   ├── running-cardano-node.md       # Step 1: cardano-node + PostgreSQL 17 + cardano-db-sync
-│   ├── FNOSetup.md                   # Step 2: midnight-node binary, session/network keys, keystore
+│   ├── Validator key genration.md    # Step 2: midnight-node binary, session/network keys, keystore
 │   ├── wireguard.md                  # Step 3: WireGuard v1.0.20250521 overlay setup
 │   ├── running validator.md          # Step 4: ~/.env, systemd unit, n+2 epoch verification
 │   └── logs and screenshots/
@@ -68,7 +68,7 @@ This repository contains two complementary deployment paths alongside observabil
     ├── alerts.yml                    # 5 alert rules under midnight-node-alerts
     ├── alertmanager.yml              # Webhook routing (group_wait 30s, repeat 4h)
     ├── Midnight Preprod Node — Full Observability.json
-    └── Screenshot 2026-11-18 011327.png
+    └── dashboard.png
 ```
 
 ---
@@ -77,7 +77,7 @@ This repository contains two complementary deployment paths alongside observabil
 
 - **Single-VM Azure Preprod Target**: Built for a single-VM deployment on Azure targeting Midnight **Preprod** (`CARDANO_SECURITY_PARAMETER=2160`).
 - **Security-First Networking**: Only SSH (`22/tcp`) is exposed during setup (plus `51820/udp` for WireGuard when the overlay is active). JSON-RPC (`9933`), Prometheus (`9615`, `9090`), and Grafana (`3000`) remain bound to localhost and are accessed via SSH port-forwarding.
-- **Substrate Keystore Over Plain-Text Seed Env Vars**: Validator signing keys (AURA, GRANDPA, Cross-Chain) are inserted into Substrate's keystore (`--base-path`) using `midnight-node key insert` (documented in [`Node Setup/FNOSetup.md`](./Node%20Setup/FNOSetup.md)) rather than passing plain-text `*_SEED_FILE` environment variables.
+- **Substrate Keystore Over Plain-Text Seed Env Vars**: Validator signing keys (AURA, GRANDPA, Cross-Chain) are inserted into Substrate's keystore (`--base-path`) using `midnight-node key insert` (documented in [`Node Setup/Validator key genration.md`](./Node%20Setup/Validator%20key%20genration.md)) rather than passing plain-text `*_SEED_FILE` environment variables.
 
 ---
 

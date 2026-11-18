@@ -37,7 +37,7 @@ flowchart LR
 | Step | Guide | What You Will Set Up | Key Outputs / Gate Before Next Step |
 | :--- | :--- | :--- | :--- |
 | **Step 1** | **[Running Cardano Node](./running-cardano-node.md)** | `cardano-node` (via Mithril snapshot), PostgreSQL 17 (`cexplorer` DB), and `cardano-db-sync` | `cardano-node` and `cardano-db-sync` are active; `sync_percent` is near `100%` |
-| **Step 2** | **[FNO Setup (Midnight Node & Keys)](./FNOSetup.md)** | `midnight` user, `midnight-node` binary, AURA/GRANDPA/Cross-Chain session keys, Substrate network key (`secret_ed25519`), and keystore | `partner-chains-public-keys.json` generated and submitted to Midnight Foundation |
+| **Step 2** | **[FNO Setup (Midnight Node & Keys)](./Validator%20key%20genration.md)** | `midnight` user, `midnight-node` binary, AURA/GRANDPA/Cross-Chain session keys, Substrate network key (`secret_ed25519`), and keystore | `partner-chains-public-keys.json` generated and submitted to Midnight Foundation |
 | **Step 3** | **[WireGuard Overlay Setup](./wireguard.md)** | WireGuard `v1.0.20250521`, WireGuard tunnel keypair, `/etc/wireguard/wg0.conf`, and Foundation peer exchange | `wg show` displays recent handshakes and non-zero data transfer; overlay IPs pingable |
 | **Step 4** | **[Running the Validator](./running%20validator.md)** | `~/.env` configuration, interactive test launch, `midnight-node` `systemd` service, and `n+2` epoch block-production verification | `midnight-node.service` is `active (running)` and authoring/finalizing blocks |
 
@@ -46,6 +46,6 @@ flowchart LR
 ## Recommended Reading Order
 
 1. Start with **[Step 1: Running Cardano Node](./running-cardano-node.md)** (note: `cardano-db-sync` takes ~6–7 hours to index Preprod, so start this first).
-2. While or after `cardano-db-sync` finishes, complete **[Step 2: FNO Setup](./FNOSetup.md)** to install `midnight-node` and generate your validator keys.
+2. While or after `cardano-db-sync` finishes, complete **[Step 2: FNO Setup](./Validator%20key%20genration.md)** to install `midnight-node` and generate your validator keys.
 3. Proceed to **[Step 3: WireGuard Overlay Setup](./wireguard.md)** using the `PeerID` generated in Step 2 to join the trusted validator mesh.
 4. Finish with **[Step 4: Running the Validator](./running%20validator.md)** to launch `midnight-node` in `--validator` mode and confirm block production.

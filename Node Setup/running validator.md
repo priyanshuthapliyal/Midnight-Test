@@ -18,7 +18,7 @@ This guide walks you through configuring environment variables, running an inter
 Before starting, confirm all three setup guides are complete:
 
 1. **Cardano Availability Layer:** Fully synced `cardano-node`, PostgreSQL `cexplorer` database, and `cardano-db-sync` ([running-cardano-node.md](./running-cardano-node.md)).
-2. **Midnight Binary & Keys:** `midnight-node` installed, validator keys generated, and `partner-chains-public-keys.json` submitted to the Midnight Foundation ([FNOSetup.md](./FNOSetup.md)).
+2. **Midnight Binary & Keys:** `midnight-node` installed, validator keys generated, and `partner-chains-public-keys.json` submitted to the Midnight Foundation ([Validator key genration.md](./Validator%20key%20genration.md)).
 3. **WireGuard Overlay:** Joined the WireGuard trusted overlay (`wg0`) and verified active handshakes with peers ([wireguard.md](./wireguard.md)).
 
 
